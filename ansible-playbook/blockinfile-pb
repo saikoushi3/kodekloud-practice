@@ -1,0 +1,40 @@
+---
+- name: block in file usage
+  hosts: all
+  become: yes
+  gather_facts: yes
+  tasks:
+   - name: create a file
+     file:
+      path: /root/facts.txt
+      state: touch
+
+
+   - name: create and enter ablock in file
+     blockinfile:
+      path: /root/facts.txt
+      block: |
+         Ansible managed node architecture is {{ ansible_architecture }}
+
+
+   - name: Install httpd package
+     package:
+       name: httpd
+       state: present
+
+
+   - name: Copy facts.txt to index.html
+     copy:
+        src: /root/facts.txt
+        dest: /var/www/html/index.html
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0644'
+
+
+   - name: Start and enable httpd service
+     service:
+        name: httpd
+        state: started
+        enabled: yes

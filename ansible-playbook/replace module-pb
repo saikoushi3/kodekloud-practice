@@ -1,0 +1,30 @@
+---
+- name: Replace string in blog.txt on app server 1
+  hosts: stapp01
+  become: yes
+  tasks:
+    - name: Replace 'xFusionCorp' with 'Nautilus' in blog.txt
+      replace:
+        path: /opt/security/blog.txt
+        regexp: 'xFusionCorp'
+        replace: 'Nautilus'
+
+- name: Replace string in story.txt on app server 2
+  hosts: stapp02
+  become: yes
+  tasks:
+    - name: Replace 'Nautilus' with 'KodeKloud' in story.txt
+      replace:
+        path: /opt/security/story.txt
+        regexp: 'Nautilus'
+        replace: 'KodeKloud'
+
+- name: Replace string in media.txt on app server 3
+  hosts: stapp03
+  become: yes
+  tasks:
+    - name: Replace 'KodeKloud' with 'xFusionCorp Industries' in media.txt
+      replace:
+        path: /opt/security/media.txt
+        regexp: 'KodeKloud'
+        replace: 'xFusionCorp Industries'

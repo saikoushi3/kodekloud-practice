@@ -1,0 +1,47 @@
+---
+- name: acl for a file
+  hosts: stapp01
+  become: yes
+  tasks:
+   - file:
+      path: /opt/security/blog.txt
+      state: touch
+   - acl:
+
+      path: /opt/security/blog.txt
+      entity: tony
+      etype: group
+      permissions: r
+      state: present
+
+
+- name: acl for a file
+  hosts: stapp02
+  become: yes
+  tasks:
+   - file:
+      path: /opt/security/story.txt
+      state: touch
+
+   - acl:
+      path: /opt/security/story.txt
+      entity: steve
+      etype: user
+      permissions: rw
+      state: present
+
+
+- name: acl for a file    
+  hosts: stapp03
+  become: yes
+  tasks:
+   - file:
+      path: /opt/security/media.txt
+      state: touch
+      
+   - acl:
+      path: /opt/security/media.txt
+      entity: banner
+      etype: group
+      permissions: rw
+      state: present
