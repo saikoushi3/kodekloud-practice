@@ -12,6 +12,7 @@
 
    - name: create and enter ablock in file
      blockinfile:
+      state: present
       path: /root/facts.txt
       block: |
          Ansible managed node architecture is {{ ansible_architecture }}
