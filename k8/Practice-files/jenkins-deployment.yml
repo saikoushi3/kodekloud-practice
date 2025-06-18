@@ -1,0 +1,56 @@
+# 1. Namespace Definition
+# This creates a dedicated logical space within the cluster for Jenkins.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins
+---
+# 2. Service Definition
+# This exposes the Jenkins deployment to the network using a NodePort.
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-service
+  namespace: jenkins
+spec:
+  # Exposes the service on a static port on each node's IP.
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      # The port on the node where the Jenkins service will be available.
+      nodePort: 30008
+  # Selects the pods to which this service will route traffic.
+  # It must match the labels on the deployment's pods.
+  selector:
+    app: jenkins
+---
+# 3. Deployment Definition
+# This defines the desired state for the Jenkins application.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-deployment
+  namespace: jenkins
+spec:
+  # Specifies that only one pod replica should be running.
+  replicas: 1
+  # Defines how the deployment finds which pods to manage.
+  selector:
+    matchLabels:
+      app: jenkins
+  # This is the template for the pods that will be created.
+  template:
+    metadata:
+      # Labels applied to each pod. The service selector uses this label.
+      labels:
+        app: jenkins
+    spec:
+      containers:
+        # Defines the container to run within the pod.
+      - name: jenkins-container
+        # The official Jenkins Docker image.
+        image: jenkins/jenkins
+        # The port that the Jenkins application listens on inside the container.
+        ports:
+        - containerPort: 8080

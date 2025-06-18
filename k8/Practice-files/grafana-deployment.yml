@@ -1,0 +1,51 @@
+# 1. Deployment Definition
+# This resource will create and manage the Grafana pod.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # The name of the deployment as requested.
+  name: grafana-deployment-devops
+  labels:
+    app: grafana
+spec:
+  # We will run a single instance of Grafana.
+  replicas: 1
+  # The selector determines which pods this deployment manages.
+  selector:
+    matchLabels:
+      app: grafana
+  # This is the template for creating the Grafana pod.
+  template:
+    metadata:
+      # The labels applied to the pod, which must match the selector.
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        # Using the official Grafana image.
+        image: grafana/grafana
+        # Grafana listens on port 3000 by default.
+        ports:
+        - containerPort: 3000
+---
+# 2. Service Definition
+# This resource will expose the Grafana deployment to be accessible
+# from outside the Kubernetes cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  # A descriptive name for the service.
+  name: grafana-service-devops
+spec:
+  # Exposes the service on a static port on each of the cluster nodes.
+  type: NodePort
+  # The port on the node that will forward traffic to the service.
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 32000
+  # This selector must match the labels of the pods to which traffic
+  # should be routed, in this case, our Grafana pod.
+  selector:
+    app: grafana

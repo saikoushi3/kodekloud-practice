@@ -1,0 +1,63 @@
+# 1. Namespace Definition
+# This creates the 'tomcat-namespace-devops' namespace to isolate the application.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tomcat-namespace-devops
+---
+# 2. Deployment Definition
+# This defines the desired state for the Tomcat application.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # The name of the deployment as requested.
+  name: tomcat-deployment-devops
+  # The deployment will be created in this namespace.
+  namespace: tomcat-namespace-devops
+  labels:
+    app: tomcat-app
+spec:
+  # Specifies that one pod replica should be running.
+  replicas: 1
+  # Defines how the deployment finds which pods to manage.
+  selector:
+    matchLabels:
+      app: tomcat-app
+  # This is the template for the pods that will be created.
+  template:
+    metadata:
+      # Labels applied to each pod. The service selector will use this label.
+      labels:
+        app: tomcat-app
+    spec:
+      containers:
+        # Defines the container to run within the pod.
+      - name: tomcat-container-devops
+        # The specific image requested for the deployment.
+        image: gcr.io/kodekloud/centos-ssh-enabled:tomcat
+        # The port that the Tomcat application listens on inside the container.
+        ports:
+        - containerPort: 8080
+---
+# 3. Service Definition
+# This exposes the Tomcat deployment to be accessible from outside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  # The name of the service as requested.
+  name: tomcat-service-devops
+  # The service will be created in this namespace.
+  namespace: tomcat-namespace-devops
+spec:
+  # Exposes the service on a static port on each node's IP.
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      # The port on the node where the Tomcat service will be available.
+      nodePort: 32227
+  # This selector must match the labels of the pods to which traffic
+  # should be routed, in this case, our Tomcat pod.
+  selector:
+    app: tomcat-app
